@@ -10,8 +10,7 @@ import {
   saveSessions, 
   loadSessions,
   subscribeToWorkouts,
-  subscribeToSessions,
-  migrateLocalStorageToFirestore
+  subscribeToSessions
 } from './services/dataService';
 
 export interface Exercise {
@@ -70,9 +69,6 @@ function App() {
         
         setWorkouts(loadedWorkouts);
         setSessions(loadedSessions);
-        
-        // Migrate localStorage data to Firestore if needed
-        await migrateLocalStorageToFirestore();
       } catch (error) {
         console.error('Error loading initial data:', error);
       } finally {
