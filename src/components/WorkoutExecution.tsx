@@ -311,6 +311,7 @@ const WorkoutExecution: React.FC<WorkoutExecutionProps> = ({ workouts, onAddSess
         
         {currentExercise?.type === 'strength' ? (
           <SetInput 
+            key={`${currentExercise.id}-${currentSetIndex}`}
             onRecord={recordSet}
             onGoBack={currentSetIndex > 0 || currentExerciseIndex > 0 ? goToPreviousSet : undefined}
             targetRepsMin={currentExercise?.repsMin || 0}
@@ -318,8 +319,9 @@ const WorkoutExecution: React.FC<WorkoutExecutionProps> = ({ workouts, onAddSess
             setNumber={currentSet}
             lastWeight={getPreviousSetWeight()}
           />
-        ) : (
+        ) : currentExercise ? (
           <CardioInput 
+            key={`${currentExercise.id}-${currentSetIndex}`}
             onRecord={recordSet}
             onGoBack={currentSetIndex > 0 || currentExerciseIndex > 0 ? goToPreviousSet : undefined}
             targetDuration={currentExercise?.duration || 0}
@@ -328,7 +330,7 @@ const WorkoutExecution: React.FC<WorkoutExecutionProps> = ({ workouts, onAddSess
             setNumber={currentSet}
             lastPerformance={lastPerformance?.sets[0]}
           />
-        )}
+        ) : null}
       </div>
 
       <div className="exercise-list">

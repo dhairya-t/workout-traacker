@@ -1,7 +1,7 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { WorkoutSession } from '../App';
-import { TrendingUp, Calendar, Dumbbell, Target, Award, MapPin } from 'lucide-react';
+import { Calendar, Dumbbell, Target, Award, MapPin } from 'lucide-react';
 
 interface DashboardProps {
   sessions: WorkoutSession[];
