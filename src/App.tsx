@@ -4,6 +4,15 @@ import Dashboard from './components/Dashboard';
 import WorkoutManager from './components/WorkoutManager';
 import WorkoutExecution from './components/WorkoutExecution';
 import { Home, Dumbbell, Play } from 'lucide-react';
+import { 
+  saveWorkouts, 
+  loadWorkouts, 
+  saveSessions, 
+  loadSessions,
+  subscribeToWorkouts,
+  subscribeToSessions,
+  migrateLocalStorageToFirestore
+} from './services/dataService';
 
 export interface Exercise {
   id: string;
@@ -48,31 +57,73 @@ function App() {
   const [currentView, setCurrentView] = useState<'dashboard' | 'manage' | 'execute'>('dashboard');
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [sessions, setSessions] = useState<WorkoutSession[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedWorkouts = localStorage.getItem('workouts');
-    const savedSessions = localStorage.getItem('sessions');
-    
-    if (savedWorkouts) {
-      setWorkouts(JSON.parse(savedWorkouts));
-    }
-    
-    if (savedSessions) {
-      setSessions(JSON.parse(savedSessions));
-    }
+    // Load initial data
+    const loadInitialData = async () => {
+      try {
+        const [loadedWorkouts, loadedSessions] = await Promise.all([
+          loadWorkouts(),
+          loadSessions()
+        ]);
+        
+        setWorkouts(loadedWorkouts);
+        setSessions(loadedSessions);
+        
+        // Migrate localStorage data to Firestore if needed
+        await migrateLocalStorageToFirestore();
+      } catch (error) {
+        console.error('Error loading initial data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadInitialData();
+
+    // Set up real-time listeners
+    const unsubscribeWorkouts = subscribeToWorkouts(setWorkouts);
+    const unsubscribeSessions = subscribeToSessions(setSessions);
+
+    // Cleanup listeners on unmount
+    return () => {
+      unsubscribeWorkouts();
+      unsubscribeSessions();
+    };
   }, []);
 
+  // Save workouts to Firebase when workouts change
   useEffect(() => {
-    localStorage.setItem('workouts', JSON.stringify(workouts));
-  }, [workouts]);
+    if (!loading && workouts.length >= 0) {
+      saveWorkouts(workouts);
+    }
+  }, [workouts, loading]);
 
+  // Save sessions to Firebase when sessions change
   useEffect(() => {
-    localStorage.setItem('sessions', JSON.stringify(sessions));
-  }, [sessions]);
+    if (!loading && sessions.length >= 0) {
+      saveSessions(sessions);
+    }
+  }, [sessions, loading]);
 
   const addSession = (session: WorkoutSession) => {
     setSessions(prev => [...prev, session]);
   };
+
+  if (loading) {
+    return (
+      <div className="app">
+        <div className="loading-screen">
+          <div className="loading-spinner">
+            <Dumbbell size={48} />
+          </div>
+          <h2>Loading your workouts...</h2>
+          <p>Syncing data across devices</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app">

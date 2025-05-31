@@ -145,9 +145,6 @@ const Dashboard: React.FC<DashboardProps> = ({ sessions }) => {
 
   const weeklyData = getWeeklyData();
 
-  // Average workout duration (estimated at 45min per workout for now)
-  const avgDuration = weekSessions.length > 0 ? Math.round((weekSessions.length * 45) / 7) : 0;
-
   return (
     <div className="dashboard">
       <div className="dashboard-header">
