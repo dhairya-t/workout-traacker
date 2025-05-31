@@ -31,15 +31,9 @@ let db: Firestore | undefined;
 if (isFirebaseConfigured()) {
   app = initializeApp(firebaseConfig);
   db = getFirestore(app);
-  console.log('🔥 Firebase initialized successfully');
 } else {
-  console.log('⚠️ Firebase not configured - using localStorage fallback');
+  console.log('Firebase not configured - using localStorage fallback');
 }
-
-// For development - uncomment to use emulator
-// if (process.env.NODE_ENV === 'development') {
-//   connectFirestoreEmulator(db, 'localhost', 8080);
-// }
 
 export { db, isFirebaseConfigured };
 export default app; 

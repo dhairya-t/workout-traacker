@@ -1,7 +1,6 @@
 import { 
-  collection, 
   doc, 
-  getDocs, 
+  getDoc,
   setDoc, 
   onSnapshot,
   Firestore
@@ -9,12 +8,10 @@ import {
 import { db, isFirebaseConfigured } from '../firebase';
 import { Workout, WorkoutSession } from '../App';
 
-const USER_ID = 'user1'; // Since it's just you, we'll use a fixed user ID
+const USER_ID = 'user1';
 
-// Check if Firebase is properly configured and available
 const useFirestore = isFirebaseConfigured();
 
-// Type guard to ensure db is properly typed
 const getDb = (): Firestore | null => {
   return (useFirestore && db) ? db : null;
 };
@@ -27,7 +24,6 @@ export const saveWorkouts = async (workouts: Workout[]) => {
       await setDoc(doc(firestore, 'users', USER_ID), { workouts });
     } catch (error) {
       console.error('Error saving workouts to Firestore:', error);
-      // Fallback to localStorage
       localStorage.setItem('workouts', JSON.stringify(workouts));
     }
   } else {
@@ -39,12 +35,11 @@ export const loadWorkouts = async (): Promise<Workout[]> => {
   const firestore = getDb();
   if (firestore) {
     try {
-      const userDoc = await getDocs(collection(firestore, 'users'));
-      const userData = userDoc.docs.find(doc => doc.id === USER_ID)?.data();
+      const userDoc = await getDoc(doc(firestore, 'users', USER_ID));
+      const userData = userDoc.data();
       return userData?.workouts || [];
     } catch (error) {
       console.error('Error loading workouts from Firestore:', error);
-      // Fallback to localStorage
       const saved = localStorage.getItem('workouts');
       return saved ? JSON.parse(saved) : [];
     }
@@ -73,8 +68,8 @@ export const loadSessions = async (): Promise<WorkoutSession[]> => {
   const firestore = getDb();
   if (firestore) {
     try {
-      const sessionDoc = await getDocs(collection(firestore, 'users', USER_ID, 'data'));
-      const sessionData = sessionDoc.docs.find(doc => doc.id === 'sessions')?.data();
+      const sessionDoc = await getDoc(doc(firestore, 'users', USER_ID, 'data', 'sessions'));
+      const sessionData = sessionDoc.data();
       return sessionData?.sessions || [];
     } catch (error) {
       console.error('Error loading sessions from Firestore:', error);
@@ -98,10 +93,10 @@ export const subscribeToWorkouts = (callback: (workouts: Workout[]) => void) => 
       });
     } catch (error) {
       console.error('Error subscribing to workouts:', error);
-      return () => {}; // Return empty unsubscribe function
+      return () => {};
     }
   }
-  return () => {}; // Return empty unsubscribe function for localStorage
+  return () => {};
 };
 
 export const subscribeToSessions = (callback: (sessions: WorkoutSession[]) => void) => {
@@ -131,12 +126,10 @@ export const migrateLocalStorageToFirestore = async () => {
     
     if (localWorkouts) {
       await saveWorkouts(JSON.parse(localWorkouts));
-      console.log('✅ Migrated workouts to Firestore');
     }
     
     if (localSessions) {
       await saveSessions(JSON.parse(localSessions));
-      console.log('✅ Migrated sessions to Firestore');
     }
   } catch (error) {
     console.error('Migration error:', error);
