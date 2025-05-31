@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Workout, Exercise } from '../App';
-import { Plus, Trash2, Edit3, Save, X } from 'lucide-react';
+import { Plus, Trash2, Edit3, Save, X, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface WorkoutManagerProps {
   workouts: Workout[];
@@ -98,6 +98,26 @@ const WorkoutManager: React.FC<WorkoutManagerProps> = ({ workouts, setWorkouts }
     }));
   };
 
+  const moveExerciseUp = (index: number) => {
+    if (index > 0) {
+      setNewWorkout(prev => {
+        const exercises = [...prev.exercises];
+        [exercises[index - 1], exercises[index]] = [exercises[index], exercises[index - 1]];
+        return { ...prev, exercises };
+      });
+    }
+  };
+
+  const moveExerciseDown = (index: number) => {
+    if (index < newWorkout.exercises.length - 1) {
+      setNewWorkout(prev => {
+        const exercises = [...prev.exercises];
+        [exercises[index], exercises[index + 1]] = [exercises[index + 1], exercises[index]];
+        return { ...prev, exercises };
+      });
+    }
+  };
+
   const startEdit = (workout: Workout) => {
     setNewWorkout({
       name: workout.name,
@@ -174,6 +194,10 @@ const WorkoutManager: React.FC<WorkoutManagerProps> = ({ workouts, setWorkouts }
                 allExerciseNames={getAllExerciseNames()}
                 onUpdate={handleUpdateExercise}
                 onRemove={handleRemoveExercise}
+                onMoveUp={() => moveExerciseUp(index)}
+                onMoveDown={() => moveExerciseDown(index)}
+                canMoveUp={index > 0}
+                canMoveDown={index < newWorkout.exercises.length - 1}
               />
             ))}
           </div>
@@ -253,9 +277,13 @@ interface ExerciseFormProps {
   allExerciseNames: string[];
   onUpdate: (index: number, field: keyof Exercise, value: string | number) => void;
   onRemove: (index: number) => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  canMoveUp: boolean;
+  canMoveDown: boolean;
 }
 
-const ExerciseForm: React.FC<ExerciseFormProps> = ({ exercise, index, allExerciseNames, onUpdate, onRemove }) => {
+const ExerciseForm: React.FC<ExerciseFormProps> = ({ exercise, index, allExerciseNames, onUpdate, onRemove, onMoveUp, onMoveDown, canMoveUp, canMoveDown }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
 
@@ -384,12 +412,34 @@ const ExerciseForm: React.FC<ExerciseFormProps> = ({ exercise, index, allExercis
         </div>
       )}
 
-      <button 
-        className="remove-exercise-button"
-        onClick={() => onRemove(index)}
-      >
-        <Trash2 size={16} />
-      </button>
+      <div className="exercise-form-bottom">
+        <div className="move-buttons">
+          <button 
+            className="move-up-button"
+            onClick={onMoveUp}
+            disabled={!canMoveUp}
+            title="Move up"
+          >
+            <ChevronUp size={16} />
+          </button>
+          <button 
+            className="move-down-button"
+            onClick={onMoveDown}
+            disabled={!canMoveDown}
+            title="Move down"
+          >
+            <ChevronDown size={16} />
+          </button>
+        </div>
+
+        <button 
+          className="remove-exercise-button"
+          onClick={() => onRemove(index)}
+          title="Remove exercise"
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
     </div>
   );
 };

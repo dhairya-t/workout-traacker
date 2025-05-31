@@ -426,23 +426,63 @@ body {
   border-color: #1a1a1a;
 }
 
-.remove-exercise-button {
+.exercise-form-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.move-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.move-up-button,
+.move-down-button {
   background: none;
+  border: 1px solid #e0e0e0;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.move-up-button:hover:not(:disabled),
+.move-down-button:hover:not(:disabled) {
+  background-color: #f8f8f8;
+  border-color: #d0d0d0;
+  color: #1a1a1a;
+}
+
+.move-up-button:disabled,
+.move-down-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.remove-exercise-button {
+  background-color: #ef4444;
+  color: #ffffff;
   border: none;
   padding: 0.5rem;
   border-radius: 6px;
-  color: #ef4444;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .remove-exercise-button:hover {
-  background-color: #fef2f2;
+  background-color: #dc2626;
 }
 
 .form-actions {
   display: flex;
   justify-content: flex-end;
+  margin-top: 1.5rem;
 }
 
 .save-button {
