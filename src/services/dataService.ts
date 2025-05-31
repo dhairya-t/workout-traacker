@@ -23,7 +23,7 @@ export const saveWorkouts = async (workouts: Workout[]) => {
   const firestore = getDb();
   if (firestore) {
     try {
-      await setDoc(doc(firestore, 'users', USER_ID), { workouts });
+      await setDoc(doc(firestore, 'users', USER_ID), { workouts, updatedAt: new Date().toISOString() }, { merge: true });
       console.log('✅ SAVED to Firebase:', workouts.length, 'workouts');
     } catch (error) {
       console.error('❌ Firebase save failed:', error);
@@ -130,19 +130,35 @@ export const subscribeToSessions = (callback: (sessions: WorkoutSession[]) => vo
 export const migrateLocalStorageToFirestore = async () => {
   const firestore = getDb();
   if (!firestore) return;
-  
+
   try {
-    const localWorkouts = localStorage.getItem('workouts');
-    const localSessions = localStorage.getItem('sessions');
-    
-    if (localWorkouts) {
-      await saveWorkouts(JSON.parse(localWorkouts));
+    const userDoc = await getDoc(doc(firestore, 'users', USER_ID));
+    const remote = userDoc.data();
+    const remoteUpdatedAt = new Date(remote?.updatedAt || 0).getTime();
+
+    const localWorkoutsRaw = localStorage.getItem('workouts');
+    if (localWorkoutsRaw) {
+      const parsedLocal = JSON.parse(localWorkoutsRaw);
+      const localWorkouts = parsedLocal.workouts || [];
+      const localUpdatedAt = new Date(parsedLocal.updatedAt || 0).getTime();
+
+      if (localUpdatedAt > remoteUpdatedAt) {
+        await saveWorkouts(localWorkouts); // uses { merge: true }
+        console.log('⬆️ Migrated localStorage to Firestore (local was newer)');
+      } else {
+        console.log('⚠️ Skipped migration — Firestore data is newer or equal');
+      }
     }
-    
-    if (localSessions) {
-      await saveSessions(JSON.parse(localSessions));
+
+    // Repeat same logic for sessions if needed
+    const localSessionsRaw = localStorage.getItem('sessions');
+    if (localSessionsRaw) {
+      const parsedSessions = JSON.parse(localSessionsRaw);
+      // Assuming you're not comparing timestamps here yet
+      await saveSessions(parsedSessions);
     }
+
   } catch (error) {
     console.error('Migration error:', error);
   }
-}; 
+};
