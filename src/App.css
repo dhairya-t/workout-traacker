@@ -150,6 +150,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 2rem;
+  margin-bottom: 2rem;
 }
 
 .chart-card {
@@ -1193,4 +1194,72 @@ body {
   input[type="number"], textarea {
     font-size: 16px;
   }
+}
+
+/* Personal Records Section */
+.prs-section {
+  background: #ffffff;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.prs-section h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.prs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.pr-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  border-left: 3px solid #f59e0b;
+}
+
+.pr-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #f59e0b;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.pr-details {
+  flex: 1;
+}
+
+.pr-exercise {
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 0.25rem;
+}
+
+.pr-stats {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.pr-date {
+  font-size: 0.75rem;
+  color: #999;
 }
