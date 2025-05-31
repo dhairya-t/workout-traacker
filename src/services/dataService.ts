@@ -12,6 +12,8 @@ const USER_ID = 'user1';
 
 const useFirestore = isFirebaseConfigured();
 
+console.log('💾 DataService: Using Firestore?', useFirestore ? 'YES' : 'NO (localStorage)');
+
 const getDb = (): Firestore | null => {
   return (useFirestore && db) ? db : null;
 };
@@ -22,12 +24,15 @@ export const saveWorkouts = async (workouts: Workout[]) => {
   if (firestore) {
     try {
       await setDoc(doc(firestore, 'users', USER_ID), { workouts });
+      console.log('✅ SAVED to Firebase:', workouts.length, 'workouts');
     } catch (error) {
-      console.error('Error saving workouts to Firestore:', error);
+      console.error('❌ Firebase save failed:', error);
       localStorage.setItem('workouts', JSON.stringify(workouts));
+      console.log('📱 Fallback to localStorage');
     }
   } else {
     localStorage.setItem('workouts', JSON.stringify(workouts));
+    console.log('📱 SAVED to localStorage:', workouts.length, 'workouts');
   }
 };
 
@@ -37,15 +42,21 @@ export const loadWorkouts = async (): Promise<Workout[]> => {
     try {
       const userDoc = await getDoc(doc(firestore, 'users', USER_ID));
       const userData = userDoc.data();
-      return userData?.workouts || [];
+      const workouts = userData?.workouts || [];
+      console.log('✅ LOADED from Firebase:', workouts.length, 'workouts');
+      return workouts;
     } catch (error) {
-      console.error('Error loading workouts from Firestore:', error);
+      console.error('❌ Firebase load failed:', error);
       const saved = localStorage.getItem('workouts');
-      return saved ? JSON.parse(saved) : [];
+      const workouts = saved ? JSON.parse(saved) : [];
+      console.log('📱 Fallback loaded from localStorage:', workouts.length, 'workouts');
+      return workouts;
     }
   } else {
     const saved = localStorage.getItem('workouts');
-    return saved ? JSON.parse(saved) : [];
+    const workouts = saved ? JSON.parse(saved) : [];
+    console.log('📱 LOADED from localStorage:', workouts.length, 'workouts');
+    return workouts;
   }
 };
 

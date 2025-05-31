@@ -11,9 +11,23 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
+// Debug: Check environment variables (safe way)
+console.log('🔧 Firebase Environment Check:');
+console.log('API Key loaded:', !!process.env.REACT_APP_FIREBASE_API_KEY);
+console.log('Project ID loaded:', !!process.env.REACT_APP_FIREBASE_PROJECT_ID);
+console.log('Auth Domain loaded:', !!process.env.REACT_APP_FIREBASE_AUTH_DOMAIN);
+console.log('All env vars present:', !!(
+  process.env.REACT_APP_FIREBASE_API_KEY &&
+  process.env.REACT_APP_FIREBASE_PROJECT_ID &&
+  process.env.REACT_APP_FIREBASE_AUTH_DOMAIN &&
+  process.env.REACT_APP_FIREBASE_STORAGE_BUCKET &&
+  process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID &&
+  process.env.REACT_APP_FIREBASE_APP_ID
+));
+
 // Check if Firebase is properly configured
 const isFirebaseConfigured = () => {
-  return !!(
+  const configured = !!(
     firebaseConfig.apiKey &&
     firebaseConfig.authDomain &&
     firebaseConfig.projectId &&
@@ -22,6 +36,9 @@ const isFirebaseConfigured = () => {
     firebaseConfig.appId &&
     firebaseConfig.projectId !== 'your-project-id'
   );
+  
+  console.log('🔧 Firebase Config Valid:', configured);
+  return configured;
 };
 
 // Initialize Firebase only if properly configured
@@ -31,8 +48,9 @@ let db: Firestore | undefined;
 if (isFirebaseConfigured()) {
   app = initializeApp(firebaseConfig);
   db = getFirestore(app);
+  console.log('🔥 Firebase initialized - USING CLOUD STORAGE');
 } else {
-  console.log('Firebase not configured - using localStorage fallback');
+  console.log('⚠️ Firebase not configured - USING LOCALSTORAGE FALLBACK');
 }
 
 export { db, isFirebaseConfigured };
