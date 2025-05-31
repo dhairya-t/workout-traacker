@@ -4,7 +4,7 @@ import { Plus, Trash2, Edit3, Save, X, ChevronUp, ChevronDown } from 'lucide-rea
 
 interface WorkoutManagerProps {
   workouts: Workout[];
-  setWorkouts: React.Dispatch<React.SetStateAction<Workout[]>>;
+  setWorkouts: (workouts: Workout[]) => Promise<void>;
 }
 
 const WorkoutManager: React.FC<WorkoutManagerProps> = ({ workouts, setWorkouts }) => {
@@ -28,20 +28,20 @@ const WorkoutManager: React.FC<WorkoutManagerProps> = ({ workouts, setWorkouts }
     return Array.from(exerciseNames).sort();
   };
 
-  const handleCreateWorkout = () => {
+  const handleCreateWorkout = async () => {
     if (newWorkout.name.trim() && newWorkout.exercises.length > 0) {
       const workout: Workout = {
         id: Date.now().toString(),
         ...newWorkout
       };
-      setWorkouts(prev => [...prev, workout]);
+      await setWorkouts([...workouts, workout]);
       setNewWorkout({ name: '', exercises: [] });
       setIsCreating(false);
     }
   };
 
-  const handleDeleteWorkout = (id: string) => {
-    setWorkouts(prev => prev.filter(w => w.id !== id));
+  const handleDeleteWorkout = async (id: string) => {
+    await setWorkouts(workouts.filter(w => w.id !== id));
   };
 
   const handleAddExercise = () => {
@@ -127,13 +127,14 @@ const WorkoutManager: React.FC<WorkoutManagerProps> = ({ workouts, setWorkouts }
     setIsCreating(true);
   };
 
-  const handleUpdateWorkout = () => {
+  const handleUpdateWorkout = async () => {
     if (editingWorkout && newWorkout.name.trim() && newWorkout.exercises.length > 0) {
-      setWorkouts(prev => prev.map(w => 
+      const updatedWorkouts = workouts.map(w => 
         w.id === editingWorkout 
           ? { ...w, name: newWorkout.name, exercises: newWorkout.exercises }
           : w
-      ));
+      );
+      await setWorkouts(updatedWorkouts);
       setNewWorkout({ name: '', exercises: [] });
       setIsCreating(false);
       setEditingWorkout(null);
