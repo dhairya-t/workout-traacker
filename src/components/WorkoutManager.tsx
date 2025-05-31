@@ -49,9 +49,9 @@ const WorkoutManager: React.FC<WorkoutManagerProps> = ({ workouts, setWorkouts }
       id: Date.now().toString(),
       name: '',
       type: 'strength',
-      sets: 3,
-      repsMin: 8,
-      repsMax: 12,
+      sets: 2,
+      repsMin: 5,
+      repsMax: 8,
       notes: ''
     };
     setNewWorkout(prev => ({
@@ -69,9 +69,9 @@ const WorkoutManager: React.FC<WorkoutManagerProps> = ({ workouts, setWorkouts }
           // Reset fields when changing type
           if (field === 'type') {
             if (value === 'strength') {
-              updated.sets = 3;
-              updated.repsMin = 8;
-              updated.repsMax = 12;
+              updated.sets = 2;
+              updated.repsMin = 5;
+              updated.repsMax = 8;
               updated.duration = undefined;
               updated.distance = undefined;
               updated.resistance = undefined;
