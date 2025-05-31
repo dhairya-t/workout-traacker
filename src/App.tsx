@@ -93,22 +93,16 @@ function App() {
     };
   }, []);
 
-  // Save workouts to Firebase when workouts change
-  useEffect(() => {
-    if (!loading && workouts.length >= 0) {
-      saveWorkouts(workouts);
-    }
-  }, [workouts, loading]);
+  // Manual save functions - only called when user makes changes
+  const handleUpdateWorkouts = async (newWorkouts: Workout[]) => {
+    setWorkouts(newWorkouts);
+    await saveWorkouts(newWorkouts);
+  };
 
-  // Save sessions to Firebase when sessions change
-  useEffect(() => {
-    if (!loading && sessions.length >= 0) {
-      saveSessions(sessions);
-    }
-  }, [sessions, loading]);
-
-  const addSession = (session: WorkoutSession) => {
-    setSessions(prev => [...prev, session]);
+  const addSession = async (session: WorkoutSession) => {
+    const newSessions = [...sessions, session];
+    setSessions(newSessions);
+    await saveSessions(newSessions);
   };
 
   if (loading) {
@@ -156,7 +150,7 @@ function App() {
 
       <main className="main">
         {currentView === 'dashboard' && <Dashboard sessions={sessions} />}
-        {currentView === 'manage' && <WorkoutManager workouts={workouts} setWorkouts={setWorkouts} />}
+        {currentView === 'manage' && <WorkoutManager workouts={workouts} setWorkouts={handleUpdateWorkouts} />}
         {currentView === 'execute' && <WorkoutExecution workouts={workouts} onAddSession={addSession} />}
       </main>
     </div>
